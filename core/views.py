@@ -6,6 +6,7 @@ from .forms import AgendamentoForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Usuario, Paciente, Agendamento
+from django.shortcuts import get_object_or_404
 
 def cadastro_paciente(request):
     
@@ -49,9 +50,9 @@ def home(request):
 
 @login_required
 def agendar_consulta(request):
-    # BLINDAGEM: Verifica se o usuário tem perfil de paciente
+    
     if request.user.tipo != 'PACIENTE':
-        # Se não for paciente, manda de volta pra home com um erro
+        
         messages.warning(request, "Apenas pacientes podem agendar consultas.")
         return redirect('home')
 
@@ -70,11 +71,40 @@ def agendar_consulta(request):
 
 @login_required
 def listar_agendamentos(request):
-    # Verifica se é paciente
+    
     if request.user.tipo != 'PACIENTE':
         return redirect('home')
     
-    # Busca as consultas do paciente logado, ordenadas por data
     agendamentos = Agendamento.objects.filter(paciente=request.user.paciente).order_by('data_horario')
     
     return render(request, 'minhas_consultas.html', {'agendamentos': agendamentos})
+
+@login_required
+def painel_medico(request):
+    
+    if request.user.tipo != 'MEDICO':
+        messages.error(request, "Acesso negado. Área restrita para médicos.")
+        return redirect('home')
+
+    agendamentos = Agendamento.objects.filter(medico=request.user.medico).order_by('data_horario')
+    
+    return render(request, 'painel_medico.html', {'agendamentos': agendamentos})
+
+@login_required
+def concluir_consulta(request, agendamento_id):
+    
+    if request.user.tipo != 'MEDICO':
+        messages.error(request, "Apenas médicos podem concluir consultas.")
+        return redirect('home')
+
+    agendamento = get_object_or_404(Agendamento, id=agendamento_id)
+
+    if agendamento.medico != request.user.medico:
+        messages.error(request, "Esse agendamento não é seu!")
+        return redirect('painel_medico')
+
+    agendamento.status = 'REALIZADO'
+    agendamento.save()
+    
+    messages.success(request, f"Consulta de {agendamento.paciente} concluída!")
+    return redirect('painel_medico')
