@@ -10,6 +10,7 @@
     <nav class="navbar navbar-dark bg-primary mb-4">
         <div class="container">
             <a class="navbar-brand" href="/">Área do Médico</a>
+            
             <span class="navbar-text text-white">
                 Dr(a). {{ user.first_name|default:user.username }}
             </span>
@@ -32,10 +33,24 @@
             {% endfor %}
         {% endif %}
 
-        <div class="row mb-3">
-            <div class="col">
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-6">
                 <h3>Minha Agenda</h3>
-                <p class="text-muted">Gerencie seus atendimentos do dia.</p>
+                <p class="text-muted mb-0">Gerencie seus atendimentos do dia.</p>
+            </div>
+            
+            <div class="col-md-6">
+                <form method="get" class="d-flex gap-2 justify-content-end">
+                    <input type="text" name="q" class="form-control" 
+                           placeholder="Buscar por Nome, CPF ou Usuário..." 
+                           value="{{ request.GET.q|default:'' }}"> 
+                    
+                    <button type="submit" class="btn btn-primary">🔍</button>
+                    
+                    {% if request.GET.q %}
+                        <a href="{% url 'painel_medico' %}" class="btn btn-outline-secondary">Limpar</a>
+                    {% endif %}
+                </form>
             </div>
         </div>
 
@@ -49,7 +64,8 @@
                                 <th>Paciente</th>
                                 <th>Observações</th>
                                 <th>Status</th>
-                                <th>Ações</th> </tr>
+                                <th>Ações</th>
+                            </tr>
                         </thead>
                         <tbody>
                             {% for agenda in agendamentos %}
@@ -78,7 +94,7 @@
                                     {% if agenda.status == 'AGENDADO' %}
                                         <a href="{% url 'concluir_consulta' agenda.id %}" 
                                            class="btn btn-sm btn-success"
-                                           onclick="return confirm('Tem certeza que deseja finalizar este atendimento?')">
+                                           onclick="return confirm('Confirma a finalização deste atendimento?')">
                                             ✅ Concluir
                                         </a>
                                     {% else %}
@@ -91,8 +107,13 @@
                     </table>
                 {% else %}
                     <div class="text-center py-5">
-                        <h4 class="text-muted">Tudo limpo!</h4>
-                        <p>Você não tem pacientes agendados no momento.</p>
+                        <h4 class="text-muted">Nenhum resultado encontrado.</h4>
+                        {% if request.GET.q %}
+                            <p>Não encontramos pacientes com o termo "<strong>{{ request.GET.q }}</strong>".</p>
+                            <a href="{% url 'painel_medico' %}" class="btn btn-link">Limpar busca</a>
+                        {% else %}
+                            <p>Sua agenda está livre por enquanto!</p>
+                        {% endif %}
                     </div>
                 {% endif %}
             </div>

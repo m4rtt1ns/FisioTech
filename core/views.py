@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Usuario, Paciente, Agendamento
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 def cadastro_paciente(request):
     
@@ -108,3 +109,22 @@ def concluir_consulta(request, agendamento_id):
     
     messages.success(request, f"Consulta de {agendamento.paciente} concluída!")
     return redirect('painel_medico')
+
+@login_required
+def painel_medico(request):
+    if request.user.tipo != 'MEDICO':
+        messages.error(request, "Acesso negado. Área restrita para médicos.")
+        return redirect('home')
+
+    agendamentos = Agendamento.objects.filter(medico=request.user.medico).order_by('data_horario')
+
+    query = request.GET.get('q')
+    
+    if query:
+        
+        agendamentos = agendamentos.filter(
+            Q(paciente__usuario__username__icontains=query) | 
+            Q(paciente__cpf__icontains=query)
+        )
+
+    return render(request, 'painel_medico.html', {'agendamentos': agendamentos})
