@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <title>Clínica Tech - Início</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .foto-nav {
+            width: 35px; height: 35px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+        a.perfil-link { text-decoration: none; }
+        a.perfil-link:hover span { text-decoration: underline; }
+    </style>
 </head>
 <body>
 
@@ -11,19 +21,31 @@
         <div class="container">
             <a class="navbar-brand" href="/">Clínica Tech</a>
             
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center gap-3">
                 {% if user.is_authenticated %}
-                    <span class="navbar-text text-white me-3">
-                        Olá, {{ user.username }} 
-                        {% if user.tipo == 'PACIENTE' %} <span class="badge bg-secondary">Paciente</span> {% endif %}
-                        {% if user.tipo == 'MEDICO' %} <span class="badge bg-success">Médico</span> {% endif %}
-                        {% if user.is_superuser %} <span class="badge bg-danger">Admin</span> {% endif %}
-                    </span>
+                    
+                    <a href="{% url 'editar_perfil' %}" class="d-flex align-items-center gap-2 perfil-link">
+                        {% if user.foto %}
+                            <img src="{{ user.foto.url }}" class="foto-nav">
+                        {% else %}
+                            <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random" class="foto-nav">
+                        {% endif %}
+                        
+                        <span class="navbar-text text-white">
+                            Olá, {{ user.first_name|default:user.username }}
+                            
+                            {% if user.tipo == 'PACIENTE' %} <span class="badge bg-secondary ms-1">Paciente</span> {% endif %}
+                            {% if user.tipo == 'MEDICO' %} <span class="badge bg-success ms-1">Médico</span> {% endif %}
+                            
+                            {% if user.tipo == 'RECEPCAO' %} <span class="badge bg-warning text-dark ms-1">Recepção</span> {% endif %}
+                        </span>
+                    </a>
                     
                     <form action="{% url 'logout' %}" method="post" class="d-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-outline-danger btn-sm">Sair</button>
                     </form>
+
                 {% else %}
                     <a href="/login/" class="btn btn-light btn-sm">Entrar</a>
                 {% endif %}
@@ -46,7 +68,7 @@
         <div class="p-5 mb-4 bg-light rounded-3 shadow-sm">
             <div class="container-fluid py-5">
                 <h1 class="display-5 fw-bold">Agendamento Online</h1>
-                <p class="col-md-8 fs-4">Bem-vindo ao sistema de gestão da Clínica Tech. Marque consultas de forma rápida e prática.</p>
+                <p class="col-md-8 fs-4">Bem-vindo ao sistema de gestão da Clínica Tech.</p>
                 
                 <hr class="my-4">
 
@@ -54,26 +76,29 @@
                     
                     {% if user.tipo == 'PACIENTE' %}
                         <h4 class="mb-3">O que deseja fazer hoje?</h4>
-                        <a href="{% url 'agendar_consulta' %}" class="btn btn-primary btn-lg">
-                            Novo Agendamento
-                        </a>
-                        <a href="{% url 'listar_agendamentos' %}" class="btn btn-outline-secondary btn-lg ms-2">
-                            Meu Histórico
-                        </a>
+                        <a href="{% url 'agendar_consulta' %}" class="btn btn-primary btn-lg">📅 Novo Agendamento</a>
+                        <a href="{% url 'listar_agendamentos' %}" class="btn btn-outline-secondary btn-lg ms-2">📂 Meu Histórico</a>
                     {% endif %}
 
                     {% if user.tipo == 'MEDICO' %}
-                        <div class="alert alert-success">
-                            <h4>Área Médica</h4>
-                            <p>Você tem acesso privilegiado ao painel de atendimentos.</p>
-                            <a href="{% url 'painel_medico' %}" class="btn btn-success btn-lg">
-                                Acessar Painel do Médico
+                        <div class="alert alert-success border-success">
+                            <h4>👨‍⚕️ Área Médica</h4>
+                            <a href="{% url 'painel_medico' %}" class="btn btn-success btn-lg">Acessar Painel do Médico</a>
+                        </div>
+                    {% endif %}
+
+                    {% if user.tipo == 'RECEPCAO' %}
+                        <div class="alert alert-warning border-warning text-dark">
+                            <h4>🛎️ Recepção e Triagem</h4>
+                            <p>Gerencie a fila de espera e confirme a presença dos pacientes.</p>
+                            <a href="{% url 'painel_recepcao' %}" class="btn btn-warning btn-lg shadow-sm">
+                                Acessar Painel da Recepção
                             </a>
                         </div>
                     {% endif %}
 
                     {% if user.is_superuser %}
-                         <a href="/admin/" class="btn btn-dark btn-lg">Ir para o Admin do Django</a>
+                         <a href="/admin/" class="btn btn-dark mt-3">Ir para o Admin do Django</a>
                     {% endif %}
 
                 {% else %}

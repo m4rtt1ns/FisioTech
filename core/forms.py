@@ -1,14 +1,15 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.utils import timezone
 from .models import Usuario, Paciente, Agendamento
-
+from .models import Prontuario
 
 class UsuarioCreationForm(UserCreationForm):
     class Meta:
         model = Usuario
         
-        fields = ('username', 'email', 'tipo')
-        
+        fields = ['username', 'email', 'tipo', 'foto']
+
     def save(self, commit=True):
         
         user = super().save(commit=False)
@@ -38,3 +39,25 @@ class AgendamentoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         from .models import Medico
         self.fields['medico'].queryset = Medico.objects.all()
+
+    def clean_data_horario(self):
+        data = self.cleaned_data.get('data_horario')
+        
+        if data and data < timezone.now():
+            raise forms.ValidationError("Você não pode agendar consultas no passado!")
+        
+        return data
+    
+class ProntuarioForm(forms.ModelForm):
+    class Meta:
+        model = Prontuario
+        fields = ['historico', 'prescricao']
+        widgets = {
+            'historico': forms.Textarea(attrs={'rows': 5, 'class': 'form-control'}),
+            'prescricao': forms.Textarea(attrs={'rows': 5, 'class': 'form-control'}),
+        }
+
+class UsuarioEditarForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = ['first_name', 'last_name', 'email', 'foto']

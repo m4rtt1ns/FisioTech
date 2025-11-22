@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-4vq+^y91crel^ul+j8hz)wk6gb#!ib5^p$@bw843lnf5^xnc9v
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -127,3 +127,7 @@ AUTH_USER_MODEL = 'core.Usuario'
 LOGIN_REDIRECT_URL = '/'
 
 LOGOUT_REDIRECT_URL = '/login/'
+
+import os
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
