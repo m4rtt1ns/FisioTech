@@ -3,14 +3,14 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.contrib import messages
-from django.db.models import Q, Sum, Avg  # <--- Importante para Gráficos e Financeiro
+from django.db.models import Q, Sum, Avg 
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
-# Seus Models
+
 from .models import Usuario, Paciente, Medico, Agendamento, Prontuario, Medicamento
 
-# Seus Forms (Incluindo o AvaliacaoForm)
+
 from .forms import (
     UsuarioCreationForm, 
     PacienteForm, 
@@ -20,11 +20,11 @@ from .forms import (
     AvaliacaoForm
 )
 
-# --- HOME ---
+
 def home(request):
     return render(request, 'index.html')
 
-# --- CADASTRO ---
+
 def cadastro_paciente(request):
     if request.method == 'POST':
         form_usuario = UsuarioCreationForm(request.POST, request.FILES)
@@ -52,7 +52,7 @@ def cadastro_paciente(request):
         'form_paciente': form_paciente
     })
 
-# --- PACIENTE: AGENDAMENTO ---
+
 @login_required
 def agendar_consulta(request):
     if request.user.tipo != 'PACIENTE':
@@ -95,7 +95,6 @@ def cancelar_agendamento(request, agendamento_id):
     
     return redirect('listar_agendamentos')
 
-# --- PACIENTE: AVALIAÇÃO ---
 @login_required
 def avaliar_consulta(request, agendamento_id):
     agendamento = get_object_or_404(Agendamento, id=agendamento_id)
@@ -119,14 +118,12 @@ def avaliar_consulta(request, agendamento_id):
 
     return render(request, 'avaliar.html', {'form': form, 'agendamento': agendamento})
 
-# --- MÉDICO: PAINEL ---
 @login_required
 def painel_medico(request):
     if request.user.tipo != 'MEDICO':
         messages.error(request, "Acesso negado.")
         return redirect('home')
 
-    # 1. Filtros e Busca
     agendamentos = Agendamento.objects.filter(medico=request.user.medico).order_by('data_horario')
     
     query = request.GET.get('q')
@@ -136,13 +133,10 @@ def painel_medico(request):
             Q(paciente__cpf__icontains=query)
         )
 
-    # 2. Dados Estatísticos
     todos = Agendamento.objects.filter(medico=request.user.medico)
     
-    # Financeiro (Soma)
     faturamento_total = todos.filter(pago=True).aggregate(Sum('valor'))['valor__sum'] or 0
     
-    # Qualidade (Média)
     media_estrelas = todos.filter(status='REALIZADO').aggregate(Avg('avaliacao'))['avaliacao__avg'] or 0
 
     contexto = {
@@ -156,7 +150,6 @@ def painel_medico(request):
 
     return render(request, 'painel_medico.html', contexto)
 
-# --- MÉDICO: ATENDIMENTO ---
 @login_required
 def realizar_atendimento(request, agendamento_id):
     if request.user.tipo != 'MEDICO':
@@ -164,7 +157,6 @@ def realizar_atendimento(request, agendamento_id):
 
     agendamento = get_object_or_404(Agendamento, id=agendamento_id)
     
-    # Cria form vazio para garantir existência da variável
     form = ProntuarioForm()
 
     if request.method == 'POST':
@@ -207,7 +199,6 @@ def visualizar_prontuario(request, agendamento_id):
         'agendamento': agendamento
     })
 
-# --- RECEPÇÃO ---
 @login_required
 def painel_recepcao(request):
     if request.user.tipo != 'RECEPCAO' and not request.user.is_superuser:
@@ -239,7 +230,6 @@ def receber_pagamento(request, agendamento_id):
     messages.success(request, f"Pagamento de R$ {agendamento.valor} confirmado!")
     return redirect('painel_recepcao')
 
-# --- PERFIL ---
 @login_required
 def editar_perfil(request):
     if request.method == 'POST':
