@@ -1,0 +1,24 @@
+# --- Python & Django ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+.env
+
+# --- Ambientes Virtuais ---
+venv/
+env/
+.venv/
+
+# --- Arquivos de Mídia (Uploads) ---
+# Ignora as fotos reais, mas mantém a pasta
+media/
+!media/.gitkeep
+
+# --- Arquivos Estáticos Coletados ---
+staticfiles/
+
+# --- Sistema Operacional ---
+.DS_Store
+Thumbs.db

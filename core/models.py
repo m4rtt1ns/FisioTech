@@ -45,10 +45,36 @@ class Paciente(models.Model):
     cpf = models.CharField('CPF', max_length=14, unique=True)
     data_nascimento = models.DateField('Data de Nascimento')
     telefone = models.CharField('Telefone', max_length=20, blank=True, null=True)
+
+    SEXO_CHOICES = (
+        ('M', 'Masculino'),
+        ('F', 'Feminino'),
+        ('O', 'Outro'),
+    )
+    sexo = models.CharField('Sexo', max_length=1, choices=SEXO_CHOICES, default='O')
     
     def __str__(self):
         nome = self.usuario.get_full_name()
         return f"Paciente: {nome if nome else self.usuario.username}"
+    
+    def whatsapp_link(self):
+        """
+        Limpa o telefone para gerar o link do WhatsApp.
+        Remove parenteses, traços e espaços.
+        Adiciona o código do Brasil (55) se não tiver.
+        """
+        if not self.telefone:
+            return None
+            
+        numeros = ''.join(filter(str.isdigit, self.telefone))
+        
+        if len(numeros) < 10:
+            return None
+    
+        if not numeros.startswith('55'):
+            numeros = f"55{numeros}"
+            
+        return f"https://wa.me/{numeros}"
 
 
 
@@ -65,7 +91,11 @@ class Agendamento(models.Model):
     
     data_horario = models.DateTimeField('Data e Hora')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='AGENDADO')
+    valor = models.DecimalField('Valor da Consulta', max_digits=10, decimal_places=2, default=200.00)
+    pago = models.BooleanField('Está Pago?', default=False)
     observacoes = models.TextField('Observações', blank=True, null=True)
+    avaliacao = models.IntegerField('Avaliação (1-5)', blank=True, null=True)
+    comentario_paciente = models.TextField('Comentário', blank=True, null=True)
     
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
@@ -110,3 +140,10 @@ class Prontuario(models.Model):
 
     def __str__(self):
         return f"Prontuário - {self.agendamento.paciente}"
+    
+class Medicamento(models.Model):
+    nome = models.CharField('Nome do Medicamento', max_length=100, unique=True)
+    generico = models.CharField('Nome Genérico', max_length=100, blank=True, null=True)
+    
+    def __str__(self):
+        return self.nome

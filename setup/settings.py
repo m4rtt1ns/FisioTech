@@ -131,3 +131,6 @@ LOGOUT_REDIRECT_URL = '/login/'
 import os
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Simula o envio de e-mail imprimindo no console
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

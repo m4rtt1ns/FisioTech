@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Avaliar Consulta{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-6">
+        <div class="card shadow border-0">
+            <div class="card-header bg-warning text-dark p-4 text-center">
+                <i class="bi bi-star-fill display-4 mb-2"></i>
+                <h3 class="mb-0 fw-bold">Avalie sua Consulta</h3>
+            </div>
+            <div class="card-body p-5 text-center">
+                
+                <h5 class="mb-3">Médico: <span class="text-primary">{{ agendamento.medico.usuario.get_full_name }}</span></h5>
+                <p class="text-muted mb-4">Sua opinião ajuda a melhorar nosso atendimento.</p>
+
+                <form method="post" class="text-start">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nota (1 a 5)</label>
+                        {{ form.avaliacao }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Deixe um comentário</label>
+                        {{ form.comentario_paciente }}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning btn-lg fw-bold shadow-sm">
+                            Enviar Avaliação
+                        </button>
+                        <a href="{% url 'listar_agendamentos' %}" class="btn btn-link text-decoration-none text-muted">Voltar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type="number"], textarea {
+        width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #dee2e6;
+        background-color: var(--bs-body-bg); color: var(--bs-body-color);
+    }
+</style>
+{% endblock %}

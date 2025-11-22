@@ -1,68 +1,81 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Recepção - Clínica Tech</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
+{% extends 'base.html' %}
 
-    <nav class="navbar navbar-dark bg-dark mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="/">Recepção Clínica Tech</a>
-            <div class="d-flex gap-3 align-items-center">
-                <span class="text-white">Olá, {{ user.username }}</span>
-                <form action="{% url 'logout' %}" method="post">
-                    {% csrf_token %}
-                    <button class="btn btn-sm btn-outline-light">Sair</button>
-                </form>
-            </div>
+{% block title %}Recepção e Triagem{% endblock %}
+
+{% block content %}
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-warning-emphasis"><i class="bi bi-bell me-2"></i>Recepção</h2>
+            <p class="text-muted">Controle de fluxo de pacientes do dia: <strong>{% now "d/m/Y" %}</strong></p>
         </div>
-    </nav>
+        <div class="badge bg-dark fs-5 px-3 py-2 shadow-sm">
+            {{ agendamentos.count }} Agendamentos
+        </div>
+    </div>
 
-    <div class="container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-
-        <div class="card shadow">
-            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">Agenda de Hoje: {% now "d/m/Y" %}</h4>
-                <span class="badge bg-light text-dark">{{ agendamentos.count }} Agendamentos</span>
-            </div>
-            <div class="card-body">
-                {% if agendamentos %}
-                <table class="table table-striped align-middle">
-                    <thead>
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            {% if agendamentos %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th>Horário</th>
-                            <th>Paciente</th>
+                            <th class="ps-4">Horário</th>
+                            <th>Paciente / Contato</th>
                             <th>Médico</th>
-                            <th>Status Atual</th>
-                            <th>Ação</th>
+                            <th>Financeiro</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Ação</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for agenda in agendamentos %}
                         <tr>
-                            <td class="fw-bold">{{ agenda.data_horario|date:"H:i" }}</td>
+                            <td class="ps-4 fw-bold text-primary">{{ agenda.data_horario|date:"H:i" }}</td>
                             
                             <td>
-                                {% if agenda.paciente.usuario.foto %}
-                                    <img src="{{ agenda.paciente.usuario.foto.url }}" style="width: 30px; height: 30px; border-radius: 50%;">
-                                {% endif %}
-                                {{ agenda.paciente.usuario.get_full_name }}
+                                <div class="d-flex align-items-center">
+                                    {% if agenda.paciente.usuario.foto %}
+                                        <img src="{{ agenda.paciente.usuario.foto.url }}" class="rounded-circle me-3 border" width="40" height="40" style="object-fit: cover;">
+                                    {% else %}
+                                        <img src="https://ui-avatars.com/api/?name={{ agenda.paciente.usuario.username }}" class="rounded-circle me-3 border" width="40">
+                                    {% endif %}
+                                    <div>
+                                        <div class="fw-bold">{{ agenda.paciente.usuario.get_full_name }}</div>
+                                        {% if agenda.paciente.whatsapp_link %}
+                                            <a href="{{ agenda.paciente.whatsapp_link }}?text=Olá, confirmamos sua consulta na Clínica Tech?" 
+                                               target="_blank" class="text-decoration-none text-success small fw-bold">
+                                               <i class="bi bi-whatsapp me-1"></i>Chamar
+                                            </a>
+                                        {% else %}
+                                            <small class="text-muted">Sem telefone</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </td>
                             
                             <td>Dr(a). {{ agenda.medico.usuario.first_name }}</td>
                             
                             <td>
+                                {% if agenda.pago %}
+                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">
+                                        <i class="bi bi-check2-all me-1"></i>Pago
+                                    </span>
+                                {% else %}
+                                    <a href="{% url 'receber_pagamento' agenda.id %}" 
+                                       class="btn btn-sm btn-outline-success"
+                                       onclick="return confirm('Confirmar recebimento de R$ {{ agenda.valor }}?')">
+                                        <i class="bi bi-cash"></i> Cobrar
+                                    </a>
+                                {% endif %}
+                            </td>
+
+                            <td>
                                 {% if agenda.status == 'AGENDADO' %}
-                                    <span class="badge bg-warning text-dark">🏠 Em Casa (Agendado)</span>
+                                    <span class="badge bg-warning text-dark border border-warning">🏠 Em Casa</span>
                                 {% elif agenda.status == 'AGUARDANDO' %}
-                                    <span class="badge bg-primary">🛋️ Sala de Espera</span>
+                                    <span class="badge bg-primary shadow-sm px-3 py-2">🛋️ Sala de Espera</span>
                                 {% elif agenda.status == 'REALIZADO' %}
                                     <span class="badge bg-success">Atendido</span>
                                 {% else %}
@@ -70,23 +83,26 @@
                                 {% endif %}
                             </td>
                             
-                            <td>
+                            <td class="text-end pe-4">
                                 {% if agenda.status == 'AGENDADO' %}
-                                    <a href="{% url 'confirmar_presenca' agenda.id %}" class="btn btn-sm btn-primary">
-                                        🔔 Confirmar Chegada
+                                    <a href="{% url 'confirmar_presenca' agenda.id %}" class="btn btn-sm btn-primary fw-bold shadow-sm">
+                                        <i class="bi bi-bell-fill me-1"></i> Chegou
                                     </a>
+                                {% else %}
+                                    <span class="text-muted">-</span>
                                 {% endif %}
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                {% else %}
-                    <p class="text-center text-muted my-5">Nenhum agendamento para hoje.</p>
-                {% endif %}
             </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-calendar-event display-4 text-muted opacity-25"></i>
+                    <p class="mt-3 text-muted">Agenda livre por hoje.</p>
+                </div>
+            {% endif %}
         </div>
     </div>
-
-</body>
-</html>
+{% endblock %}

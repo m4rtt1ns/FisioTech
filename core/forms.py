@@ -20,7 +20,7 @@ class UsuarioCreationForm(UserCreationForm):
 class PacienteForm(forms.ModelForm):
     class Meta:
         model = Paciente
-        fields = ['cpf', 'data_nascimento', 'telefone']
+        fields = ['cpf', 'data_nascimento', 'telefone', 'sexo']
         
         widgets = {
             'data_nascimento': forms.DateInput(attrs={'type': 'date'}),
@@ -60,4 +60,13 @@ class ProntuarioForm(forms.ModelForm):
 class UsuarioEditarForm(forms.ModelForm):
     class Meta:
         model = Usuario
-        fields = ['first_name', 'last_name', 'email', 'foto']
+        fields = ['email', 'foto']
+
+class AvaliacaoForm(forms.ModelForm):
+    class Meta:
+        model = Agendamento
+        fields = ['avaliacao', 'comentario_paciente']
+        widgets = {
+            'avaliacao': forms.NumberInput(attrs={'min': 1, 'max': 5, 'class': 'form-control'}),
+            'comentario_paciente': forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': 'Elogios, críticas ou sugestões...'}),
+        }
