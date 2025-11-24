@@ -1,117 +1,140 @@
-# 🏥 Clínica Tech - Sistema de Gestão Hospitalar (SaaS)
+# 🧘‍♂️ FisioTech - Sistema de Gestão para Clínicas de Fisioterapia
 
-Atualizado: documentação completa do projeto, instruções para rodar localmente, links para arquivos-chave e arquivos de documentação recomendados.
+![Status](https://img.shields.io/badge/Status-Concluído-success?style=for-the-badge)
+![Python](https://img.shields.io/badge/Python-3.10+-blue?style=for-the-badge&logo=python&logoColor=white)
+![Django](https://img.shields.io/badge/Django-5.0-092E20?style=for-the-badge&logo=django&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple?style=for-the-badge&logo=bootstrap&logoColor=white)
 
-Status: Concluído  
-Tecnologias: Python 3.10+, Django 5, Bootstrap 5, SQLite, Pillow
+Um sistema SaaS completo (Full Stack) focado na gestão de clínicas de fisioterapia e reabilitação. O projeto vai além do agendamento básico, oferecendo ferramentas visuais para acompanhamento da evolução do paciente, controle financeiro e conformidade com a LGPD.
 
-Sumário
-- Visão geral
-- Como rodar localmente (dev)
-- Estrutura do projeto & links (arquivos-chave)
-- Modelos, Forms e Views principais (links para símbolos)
-- Templates
-- Migrações / Banco de dados
-- Admin / superuser
-- Testes
-- Notas sobre mídia / uploads
-- Arquivos de documentação recomendados
-- Comandos úteis
+---
 
-Visão geral
-Um sistema completo para gestão de clínica: agendamento, triagem (recepção), área do médico, prontuário eletrônico, perfil do paciente com upload de foto, pagamento simples e avaliações.
+## 🚀 Funcionalidades Exclusivas
 
-Como rodar localmente (desenvolvimento)
-1. Crie e ative o virtualenv (exemplo Unix):
-```sh
+### 🩺 Módulo do Fisioterapeuta
+- **Gráfico de Evolução da Dor:** Visualização automática (Chart.js) da melhora do paciente baseada no histórico da Escala EVA.
+- **Prontuário Visual:** Registro de sessão com **Slider de Dor Interativo** (0-10) e autocomplete de exercícios/condutas.
+- **Dashboard Inteligente:** KPIs de qualidade (Nota Média), Faturamento do dia e Gráfico de Status (Rosca).
+- **Fila em Tempo Real:** Identificação visual de pacientes que já realizaram check-in.
+
+### 👤 Portal do Paciente
+- **Login Simplificado:** Acesso via CPF.
+- **Auto-Agendamento:** Calendário inteligente com bloqueio de horários passados e feriados.
+- **Minha Evolução:** Acesso ao histórico de sessões e visualização de receitas/orientações.
+- **Feedback:** Avaliação de atendimento (Estrelas) pós-consulta.
+- **LGPD:** Ferramentas para gestão de privacidade e desativação de conta ("Direito ao Esquecimento").
+
+### 🛎️ Recepção & Gestão
+- **Integração WhatsApp:** Botão "Chamar no Zap" que abre conversa direta com o paciente com mensagem personalizada.
+- **Triagem:** Confirmação de presença (Check-in) que notifica o painel médico.
+- **Controle Financeiro:** Gestão de pagamentos (Pendente/Pago) e relatórios de caixa.
+
+### 🎨 Interface e UX (User Experience)
+- **Identidade Visual:** Design clean focado em saúde (Teal/Verde-Água).
+- **Dark Mode Nativo:** Suporte completo a tema escuro/claro via Bootstrap 5.3.
+- **Responsividade:** Layout adaptável para tablets e celulares.
+- **Micro-interações:** Animações suaves (AOS) e feedback de carregamento.
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+- **Back-end:** Python 3, Django 5.
+- **Front-end:** HTML5, CSS3, Bootstrap 5.3, JavaScript.
+- **Visualização de Dados:** Chart.js (Gráficos de Rosca e Linha).
+- **Banco de Dados:** PostgreSQL.
+- **Segurança:** Hash de senhas Argon2, CSRF Protection, Auditoria de Logs (LGPD).
+- **Deploy Ready:** Configurado com Gunicorn e WhiteNoise.
+
+---
+
+## ⚙️ Instalação e Configuração
+
+Siga os passos abaixo para rodar o projeto localmente:
+
+### 1. Clone o repositório
+```bash
+git clone [https://github.com/SEU-USUARIO/fisiotech.git](https://github.com/SEU-USUARIO/fisiotech.git)
+cd fisiotech
+````
+
+2\. Crie o ambiente virtual
+
+```bash
+  Linux/Mac
 python3 -m venv venv
 source venv/bin/activate
+
+  Windows
+python -m venv venv
+venv\Scripts\activate
 ```
-2. Instale as dependências:
-```sh
+
+### 3\. Instale as dependências
+
+```bash
 pip install -r requirements.txt
 ```
-3. Acesse o diretório do projeto (onde está o `manage.py`):
-```sh
-cd caminho/para/o/projeto
-```
-4. Aplique as migrações iniciais:
-```sh
+
+### 4\. Configure o Banco de Dados
+
+```bash
+python manage.py makemigrations
 python manage.py migrate
 ```
-5. Crie um superusuário para acessar o admin:
-```sh
+
+### 5\. Popule o Banco com Dados Fictícios (Opcional)
+
+O sistema possui um script para gerar médicos, pacientes e consultas automaticamente para teste:
+
+```bash
+python manage.py popular_banco
+```
+
+### 6\. Crie um Superusuário (Caso não use o script)
+
+```bash
 python manage.py createsuperuser
 ```
-6. Inicie o servidor local:
-```sh
+
+### 7\. Inicie o Servidor
+
+```bash
 python manage.py runserver
 ```
-7. Acesse o sistema em: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
-Estrutura do projeto & links (arquivos-chave)
-- Entrypoint do projeto: [manage.py](manage.py)
-- Configurações: [`setup.settings`](setup/settings.py) — ver [setup/settings.py](setup/settings.py)
-- URLs principais: [`setup.urls`](setup/urls.py) — ver [setup/urls.py](setup/urls.py) e app: [core/urls.py](core/urls.py)
+Acesse: `http://127.0.0.1:8000`
 
-Modelos, Forms e Views principais (links para símbolos)
-Modelos principais (app core):
-- [`core.models.Usuario`](core/models.py)
-- [`core.models.Medico`](core/models.py)
-- [`core.models.Paciente`](core/models.py)
-- [`core.models.Agendamento`](core/models.py)
-- [`core.models.Prontuario`](core/models.py)  
-(arquivo: [core/models.py](core/models.py))
+-----
 
-Forms importantes:
-- [`core.forms.UsuarioCreationForm`](core/forms.py)
-- [`core.forms.UsuarioEditarForm`](core/forms.py)
-- [`core.forms.AgendamentoForm`](core/forms.py)
-- [`core.forms.ProntuarioForm`](core/forms.py)  
-(arquivo: [core/forms.py](core/forms.py))
+## 🧪 Perfis de Acesso para Teste
 
-Views principais:
-- Cadastro / auth: [`core.views.cadastro_paciente`](core/views.py)
-- Agendamento: [`core.views.agendar_consulta`](core/views.py), [`core.views.listar_agendamentos`](core/views.py)
-- Painéis: [`core.views.painel_medico`](core/views.py), [`core.views.painel_recepcao`](core/views.py)
-- Atendimento / prontuário: [`core.views.realizar_atendimento`](core/views.py), [`core.views.visualizar_prontuario`](core/views.py)
-- Operações rápidas: [`core.views.confirmar_presenca`](core/views.py), [`core.views.cancelar_agendamento`](core/views.py), [`core.views.concluir_consulta`](core/views.py)  
-(arquivo: [core/views.py](core/views.py))
+Se você rodou o script `popular_banco`, use:
 
-Templates:
-- Pasta: [core/templates](core/templates)
-  - login: [core/templates/login.html](core/templates/login.html)
-  - home/index: [core/templates/index.html](core/templates/index.html)
-  - agendar: [core/templates/agendar.html](core/templates/agendar.html)
-  - painel médico: [core/templates/painel_medico.html](core/templates/painel_medico.html)
-  - painel recepção: [core/templates/painel_recepcao.html](core/templates/painel_recepcao.html)
-  - prontuário visualização: [core/templates/prontuario_view.html](core/templates/prontuario_view.html)
-  - editar perfil: [core/templates/editar_perfil.html](core/templates/editar_perfil.html)
-  - minhas consultas: [core/templates/minhas_consultas.html](core/templates/minhas_consultas.html)
+  * **Médico:** `dr_nome` / Senha: `123`
+  * **Paciente:** `CPF_GERADO` / Senha: `123`
 
-Migrações / Banco de dados:
-- Pasta: [core/migrations](core/migrations) — por exemplo [core/migrations/0001_initial.py](core/migrations/0001_initial.py), [core/migrations/0002_prontuario.py](core/migrations/0002_prontuario.py), [core/migrations/0003_usuario_foto.py](core/migrations/0003_usuario_foto.py)
+Para criar manualmente:
 
-Admin / superuser
-Acesse o admin em: [http://127.0.0.1:8000/admin](http://127.0.0.1:8000/admin) com o superusuário criado.
+1.  **Médico:** Crie um usuário, marque tipo `MEDICO` e cadastre o perfil na tabela `Medicos`.
+2.  **Recepção:** Crie um usuário e marque tipo `RECEPCAO`.
 
-Testes
-Para rodar os testes:
-```sh
-python manage.py test
-```
+-----
 
-Notas sobre mídia / uploads
-Pasta de uploads: `media/` (ver `settings.py`)
+## 📝 Licença
 
-Arquivos de documentação recomendados
-- [Documentação do Django](https://docs.djangoproject.com/en/stable/)
-- [Documentação do Bootstrap](https://getbootstrap.com/docs/5.0/getting-started/introduction/)
-- [Documentação do SQLite](https://www.sqlite.org/docs.html)
+Projeto desenvolvido para fins acadêmicos (Extensão Universitária).
 
-Comandos úteis
-- Rodar o servidor: `python manage.py runserver`
-- Criar migrações: `python manage.py makemigrations`
-- Aplicar migrações: `python manage.py migrate`
-- Criar superusuário: `python manage.py createsuperuser`
-- Rodar testes: `python manage.py test`
+````
+
+---
+
+### Passo 3: Subir as Alterações para o GitHub
+
+Agora é só mandar tudo para a nuvem:
+
+```bash
+git add .
+git commit -m "Update Final: Design Fisioterapia, Gráficos de Evolução e LGPD"
+git push
+````

@@ -1,57 +1,49 @@
 {% extends 'base.html' %}
 
-{% block title %}Acesso ao Sistema{% endblock %}
+{% block title %}Acesso - FisioTech{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center align-items-center" style="min-height: 75vh;">
     <div class="col-md-5 col-lg-4">
         
         <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-            <div class="bg-primary h-1"></div>
+            <div style="height: 6px; background: var(--primary-color);"></div>
             
             <div class="card-body p-5">
-                
                 <div class="text-center mb-4">
-                    <div class="d-inline-block bg-primary-subtle p-3 rounded-circle text-primary mb-3">
-                        <i class="bi bi-activity display-4"></i>
+                    <div class="d-inline-block p-3 rounded-circle mb-3" style="background-color: var(--primary-light); color: var(--primary-color);">
+                        <i class="bi bi-heart-pulse-fill display-4"></i>
                     </div>
-                    <h2 class="fw-bold text-dark">Bem-vindo</h2>
-                    <p class="text-muted">Faça login para gerenciar sua clínica.</p>
+                    <h3 class="fw-bold text-dark">Bem-vindo</h3>
+                    <p class="text-muted small">Entre para gerenciar sua saúde.</p>
                 </div>
 
                 <form method="post">
                     {% csrf_token %}
                     
                     {% if form.errors %}
-                        <div class="alert alert-danger d-flex align-items-center p-2 small" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <div>Usuário ou senha incorretos.</div>
+                        <div class="alert alert-danger small py-2 text-center rounded-3 border-0 bg-danger bg-opacity-10 text-danger">
+                            Dados incorretos.
                         </div>
                     {% endif %}
 
                     <div class="form-floating mb-3">
-                        <input type="text" name="username" class="form-control" id="floatingInput" placeholder="Usuário" required autofocus>
-                        <label for="floatingInput"><i class="bi bi-person me-2"></i>Usuário</label>
+                        <input type="text" name="username" class="form-control rounded-3" id="id_user" placeholder="CPF" required>
+                        <label for="id_user">CPF ou Usuário</label>
                     </div>
 
-                    <div class="form-floating mb-2">
-                        <input type="password" name="password" class="form-control" id="floatingPassword" placeholder="Senha" required>
-                        <label for="floatingPassword"><i class="bi bi-lock me-2"></i>Senha</label>
+                    <div class="form-floating mb-4">
+                        <input type="password" name="password" class="form-control rounded-3" id="id_pass" placeholder="Senha" required>
+                        <label for="id_pass">Senha</label>
                     </div>
 
-                    <div class="text-end mb-4">
-                        <a href="{% url 'password_reset' %}" class="text-decoration-none small text-primary fw-bold">
-                            Esqueceu a senha?
-                        </a>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm hover-scale">
-                        Entrar no Sistema
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow text-white">
+                        ENTRAR
                     </button>
                     
-                    <div class="text-center mt-4">
-                        <p class="small text-muted mb-0">Ainda não tem conta?</p>
-                        <a href="/cadastro/" class="text-decoration-none fw-bold">Criar conta de Paciente</a>
+                    <div class="text-center mt-4 d-flex justify-content-between align-items-center">
+                        <a href="/cadastro/" class="text-decoration-none fw-bold text-secondary small">Criar Conta</a>
+                        <a href="{% url 'password_reset' %}" class="text-decoration-none fw-bold text-primary small">Esqueci a senha</a>
                     </div>
                 </form>
             </div>

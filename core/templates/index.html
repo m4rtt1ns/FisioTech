@@ -1,43 +1,40 @@
 {% extends 'base.html' %}
 
-{% block title %}Início - Clínica Tech{% endblock %}
+{% block title %}Início - FisioTech{% endblock %}
 
 {% block content %}
 
     {% if user.is_authenticated %}
         
-        <div class="p-5 mb-4 bg-body-tertiary rounded-3 shadow-sm border">
-            <div class="container-fluid py-3">
-                <h1 class="display-5 fw-bold text-primary">
-                    Bem-vindo, {{ user.first_name|default:user.username }}!
-                </h1>
-                <p class="col-md-8 fs-5 text-muted">Seu painel de gestão clínica está pronto.</p>
-                <hr class="my-4">
+        <div class="p-5 mb-4 bg-white rounded-4 shadow-sm position-relative overflow-hidden">
+            <div class="position-absolute top-0 end-0 opacity-10 p-5">
+                <i class="bi bi-activity display-1 text-primary"></i>
+            </div>
+
+            <div class="container-fluid py-2 position-relative">
+                <h1 class="display-6 fw-bold text-dark">Olá, <span style="color: var(--primary-color);">{{ user.first_name|default:user.username }}</span>!</h1>
+                <p class="col-md-8 fs-5 text-muted">Bem-vindo ao seu espaço de saúde e movimento.</p>
+                <hr class="my-4 border-secondary opacity-25">
 
                 <div class="row g-4">
-                    
                     {% if user.tipo == 'PACIENTE' %}
                         <div class="col-md-6">
-                            <div class="card h-100 border-0 bg-primary text-white shadow hover-scale">
-                                <div class="card-body p-4 d-flex flex-column justify-content-between">
-                                    <div>
-                                        <i class="bi bi-calendar-plus display-4 mb-3"></i>
-                                        <h3>Agendar Consulta</h3>
-                                        <p class="opacity-75">Escolha seu médico e horário.</p>
-                                    </div>
-                                    <a href="{% url 'agendar_consulta' %}" class="btn btn-light text-primary fw-bold stretched-link">Acessar</a>
+                            <div class="card h-100 border-0" style="background: linear-gradient(135deg, #009688 0%, #4db6ac 100%); color: white;">
+                                <div class="card-body p-4">
+                                    <i class="bi bi-calendar2-check display-4 mb-3 opacity-75"></i>
+                                    <h3>Agendar Sessão</h3>
+                                    <p class="opacity-75">Marque sua próxima consulta de fisioterapia.</p>
+                                    <a href="{% url 'agendar_consulta' %}" class="btn btn-light text-primary fw-bold stretched-link px-4 rounded-pill">Agendar Agora</a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="card h-100 border-0 bg-body shadow">
-                                <div class="card-body p-4 d-flex flex-column justify-content-between">
-                                    <div>
-                                        <i class="bi bi-folder2-open display-4 mb-3 text-secondary"></i>
-                                        <h3>Meu Histórico</h3>
-                                        <p class="text-muted">Veja receitas, status e avalie atendimentos.</p>
-                                    </div>
-                                    <a href="{% url 'listar_agendamentos' %}" class="btn btn-outline-secondary stretched-link">Ver Lista</a>
+                            <div class="card h-100 border-0 bg-white shadow-sm hover-scale">
+                                <div class="card-body p-4">
+                                    <i class="bi bi-clipboard-data display-4 mb-3 text-secondary"></i>
+                                    <h3 class="text-dark">Minha Evolução</h3>
+                                    <p class="text-muted">Acompanhe seu histórico e exercícios.</p>
+                                    <a href="{% url 'listar_agendamentos' %}" class="btn btn-outline-secondary rounded-pill stretched-link">Ver Histórico</a>
                                 </div>
                             </div>
                         </div>
@@ -45,14 +42,12 @@
 
                     {% if user.tipo == 'MEDICO' %}
                         <div class="col-12">
-                            <div class="card border-0 bg-primary text-white shadow">
-                                <div class="card-body p-5 text-center">
-                                    <i class="bi bi-hospital display-1 mb-3"></i>
-                                    <h2>Painel do Médico</h2>
-                                    <p class="fs-5 opacity-75">Gerencie fila de espera, prontuários, faturamento e avaliações.</p>
-                                    <a href="{% url 'painel_medico' %}" class="btn btn-light btn-lg text-primary fw-bold mt-3 px-5 shadow">
-                                        <i class="bi bi-box-arrow-in-right me-2"></i> Entrar no Consultório
-                                    </a>
+                            <div class="card border-0 bg-white shadow-sm hover-scale">
+                                <div class="card-body p-5 text-center border border-2 border-light rounded-4">
+                                    <div class="text-primary mb-3"><i class="bi bi-person-workspace display-1"></i></div>
+                                    <h2 class="fw-bold">Área do Fisioterapeuta</h2>
+                                    <p class="text-muted">Gerencie pacientes, evoluções e agenda do dia.</p>
+                                    <a href="{% url 'painel_medico' %}" class="btn btn-primary btn-lg px-5 rounded-pill shadow">Acessar Consultório</a>
                                 </div>
                             </div>
                         </div>
@@ -60,24 +55,14 @@
 
                     {% if user.tipo == 'RECEPCAO' %}
                         <div class="col-12">
-                            <div class="card border-0 bg-warning text-dark shadow">
+                            <div class="card border-0 bg-warning bg-opacity-10 shadow-sm hover-scale">
                                 <div class="card-body p-5 text-center">
-                                    <i class="bi bi-bell display-1 mb-3"></i>
-                                    <h2>Painel da Recepção</h2>
-                                    <p class="fs-5">Controle de triagem, confirmação de presença e WhatsApp.</p>
-                                    <a href="{% url 'painel_recepcao' %}" class="btn btn-dark btn-lg mt-3 px-5 shadow">
-                                        Acessar Balcão
-                                    </a>
+                                    <div class="text-warning mb-3"><i class="bi bi-bell display-1"></i></div>
+                                    <h2 class="fw-bold text-dark">Recepção & Triagem</h2>
+                                    <p class="text-muted">Controle de fluxo e confirmação de presença.</p>
+                                    <a href="{% url 'painel_recepcao' %}" class="btn btn-warning text-white btn-lg px-5 rounded-pill shadow">Acessar Painel</a>
                                 </div>
                             </div>
-                        </div>
-                    {% endif %}
-
-                    {% if user.is_superuser %}
-                        <div class="col-12 text-center">
-                             <a href="/admin/" class="btn btn-outline-secondary btn-sm mt-3">
-                                <i class="bi bi-gear-fill me-1"></i> Administração do Django
-                             </a>
                         </div>
                     {% endif %}
                 </div>
@@ -87,41 +72,45 @@
     {% else %}
 
         <div class="text-center my-5">
-            <h1 class="display-3 fw-bold mb-3 text-gradient">Cuidar é nossa tecnologia.</h1>
-            <p class="lead text-muted mb-5">Agendamento simples, histórico digital e os melhores especialistas.</p>
+            <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill mb-3 text-uppercase fw-bold tracking-wider">Especialistas em Movimento</span>
+            <h1 class="display-3 fw-bold mb-3 text-dark">Recupere seu <span style="color: var(--primary-color);">bem-estar.</span></h1>
+            <p class="lead text-muted mb-5 col-lg-8 mx-auto">Agendamento online simples, acompanhamento de evolução e os melhores profissionais de fisioterapia ao seu alcance.</p>
             
             <div class="row justify-content-center g-4 mb-5">
                 <div class="col-md-3">
-                    <div class="card h-100 border-0 shadow-sm p-4 bg-body-tertiary">
+                    <div class="card h-100 border-0 shadow-sm p-4 text-center hover-scale">
                         <div class="card-body">
-                            <i class="bi bi-heart-pulse text-danger display-4 mb-3"></i>
-                            <h5 class="fw-bold">Cardiologia</h5>
-                            <p class="text-muted small">Cuidado completo para o coração.</p>
+                            <div class="bg-primary bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
+                                <i class="bi bi-emoji-smile text-primary fs-2"></i>
+                            </div>
+                            <h5 class="fw-bold">Pilates Clínico</h5>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card h-100 border-0 shadow-sm p-4 bg-body-tertiary">
+                    <div class="card h-100 border-0 shadow-sm p-4 text-center hover-scale">
                         <div class="card-body">
-                            <i class="bi bi-lungs text-info display-4 mb-3"></i>
-                            <h5 class="fw-bold">Pneumologia</h5>
-                            <p class="text-muted small">Especialistas em vias respiratórias.</p>
+                            <div class="bg-secondary bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
+                                <i class="bi bi-activity text-secondary fs-2"></i>
+                            </div>
+                            <h5 class="fw-bold">Reabilitação</h5>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <div class="card h-100 border-0 shadow-sm p-4 bg-body-tertiary">
+                    <div class="card h-100 border-0 shadow-sm p-4 text-center hover-scale">
                         <div class="card-body">
-                            <i class="bi bi-bandaid text-warning display-4 mb-3"></i>
-                            <h5 class="fw-bold">Pediatria</h5>
-                            <p class="text-muted small">Atendimento humanizado infantil.</p>
+                            <div class="bg-warning bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
+                                <i class="bi bi-bandaid text-warning fs-2"></i>
+                            </div>
+                            <h5 class="fw-bold">Ortopedia</h5>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <a href="/cadastro/" class="btn btn-primary btn-lg px-5 rounded-pill shadow-lg">
-                Agendar Consulta Agora <i class="bi bi-arrow-right ms-2"></i>
+            <a href="/cadastro/" class="btn btn-primary btn-lg px-5 py-3 rounded-pill shadow-lg fw-bold text-white">
+                Agendar Avaliação <i class="bi bi-arrow-right ms-2"></i>
             </a>
         </div>
 

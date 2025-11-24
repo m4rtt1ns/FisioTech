@@ -8,6 +8,7 @@ urlpatterns = [
     # --- CADASTRO ---
     path('cadastro/', views.cadastro_paciente, name='cadastro_paciente'),
     path('perfil/editar/', views.editar_perfil, name='editar_perfil'),
+    path('perfil/desativar/', views.desativar_conta, name='desativar_conta'),
 
     # --- PACIENTE ---
     path('agendar/', views.agendar_consulta, name='agendar_consulta'),

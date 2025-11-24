@@ -6,54 +6,65 @@
 <div class="row justify-content-center py-5">
     <div class="col-lg-8">
         <div class="card shadow-lg border-0 rounded-4">
-            <div class="card-header bg-primary text-white p-4 rounded-top-4">
-                <h3 class="mb-0 fw-bold"><i class="bi bi-person-plus-fill me-2"></i>Criar Nova Conta</h3>
-                <p class="mb-0 opacity-75">Preencha seus dados para acessar o sistema.</p>
+            <div class="card-header bg-primary text-white p-4 text-center">
+                <h3 class="mb-0 fw-bold">Cadastro de Paciente</h3>
+                <p class="mb-0 opacity-75">Use seu CPF como login.</p>
             </div>
             
             <div class="card-body p-5">
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
 
-                    <h5 class="text-primary mb-4 border-bottom pb-2">1. Dados de Acesso</h5>
-                    <div class="row g-3 mb-4">
-                        {% for field in form_usuario %}
+                    {% if form_usuario.errors or form_paciente.errors %}
+                        <div class="alert alert-danger">Por favor, corrija os erros abaixo.</div>
+                    {% endif %}
+
+                    <h5 class="text-primary border-bottom pb-2 mb-3">1. Dados Pessoais</h5>
+                    <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label fw-bold">{{ field.label }}</label>
-                            {{ field }} {% if field.help_text %}
-                                <div class="form-text small">{{ field.help_text }}</div>
-                            {% endif %}
+                            <label class="form-label fw-bold">CPF (Somente números)</label>
+                            {{ form_paciente.cpf }}
                         </div>
-                        {% endfor %}
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Data de Nascimento</label>
+                            {{ form_paciente.data_nascimento }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Telefone</label>
+                            {{ form_paciente.telefone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Sexo</label>
+                            {{ form_paciente.sexo }}
+                        </div>
                     </div>
 
-                    <h5 class="text-primary mb-4 border-bottom pb-2">2. Dados Pessoais</h5>
-                    <div class="row g-3 mb-4">
-                        {% for field in form_paciente %}
-                        <div class="col-md-12">
+                    <h5 class="text-primary border-bottom pb-2 mb-3 mt-4">2. Dados da Conta</h5>
+                    
+                    {% for field in form_usuario %}
+                        <div class="mb-3">
                             <label class="form-label fw-bold">{{ field.label }}</label>
                             {{ field }}
+                            <script>document.getElementById("{{ field.id_for_label }}").classList.add('form-control');</script>
+                            
+                            {% if field.help_text %}
+                                <div class="form-text small">{{ field.help_text|safe }}</div>
+                            {% endif %}
+                            {% if field.errors %}
+                                <div class="text-danger small">{{ field.errors }}</div>
+                            {% endif %}
                         </div>
-                        {% endfor %}
-                    </div>
+                    {% endfor %}
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5">
-                        <a href="/" class="btn btn-outline-secondary px-4">Cancelar</a>
-                        <button type="submit" class="btn btn-success px-5 fw-bold">
-                            <i class="bi bi-check-lg me-2"></i>Confirmar Cadastro
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-success btn-lg fw-bold">
+                            Criar Minha Conta
                         </button>
+                        <a href="/login/" class="btn btn-link text-muted">Já tenho conta</a>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-    input, select, textarea {
-        width: 100%; padding: 10px; border: 1px solid #dee2e6; border-radius: 8px;
-        background-color: var(--bs-body-bg); color: var(--bs-body-color);
-    }
-    input:focus, select:focus { border-color: var(--bs-primary); outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 148, 136, 0.25); }
-</style>
 {% endblock %}

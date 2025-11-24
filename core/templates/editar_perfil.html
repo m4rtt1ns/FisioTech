@@ -9,7 +9,7 @@
         <div class="card shadow border-0 rounded-4">
             <div class="card-header bg-white border-0 pt-4 pb-0 px-4">
                 <h4 class="fw-bold text-primary"><i class="bi bi-person-vcard me-2"></i>Gerenciar Conta</h4>
-                <p class="text-muted small">Mantenha seus dados de contato e acesso atualizados.</p>
+                <p class="text-muted small">Mantenha seus dados atualizados.</p>
                 <hr>
             </div>
 
@@ -18,6 +18,10 @@
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     
+                    {% if form.errors %}
+                        <div class="alert alert-danger small">Verifique os dados abaixo.</div>
+                    {% endif %}
+
                     <div class="d-flex align-items-center mb-4 bg-body-tertiary p-3 rounded-3 border">
                         <div class="position-relative me-3">
                             {% if user.foto %}
@@ -30,29 +34,29 @@
                             </div>
                         </div>
                         <div class="flex-grow-1">
-                            <label class="form-label fw-bold small text-uppercase mb-1">Alterar Foto</label>
-                            {{ form.foto }} </div>
+                            <label class="form-label fw-bold small text-uppercase mb-1">Nova Foto</label>
+                            {{ form.foto }}
+                        </div>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label fw-bold text-secondary small text-uppercase">
-                            <i class="bi bi-envelope-at me-1"></i>E-mail de Acesso
+                            <i class="bi bi-envelope-at me-1"></i>E-mail
                         </label>
                         {{ form.email }}
-                        <div class="form-text">Utilizado para recuperação de senha e notificações.</div>
                     </div>
 
                     <div class="alert alert-light border d-flex justify-content-between align-items-center mb-4">
                         <div>
                             <strong>Senha de Acesso</strong><br>
-                            <small class="text-muted">Recomendamos trocar periodicamente.</small>
+                            <small class="text-muted">Troque periodicamente.</small>
                         </div>
                         <a href="{% url 'password_change' %}" class="btn btn-outline-warning fw-bold btn-sm">
                             <i class="bi bi-key-fill me-1"></i> Alterar Senha
                         </a>
                     </div>
 
-                    <div class="d-grid gap-2 d-flex justify-content-end">
+                    <div class="d-grid gap-2 d-flex justify-content-end mb-4">
                         {% if user.tipo == 'MEDICO' %}
                             <a href="{% url 'painel_medico' %}" class="btn btn-light border px-4">Voltar</a>
                         {% elif user.tipo == 'RECEPCAO' %}
@@ -62,8 +66,15 @@
                         {% endif %}
 
                         <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">
-                            <i class="bi bi-check-circle-fill me-2"></i>Salvar Alterações
+                            <i class="bi bi-check-circle-fill me-2"></i>Salvar
                         </button>
+                    </div>
+
+                    <div class="border-top pt-3 text-center">
+                        <p class="text-muted small mb-2">Deseja encerrar seu vínculo?</p>
+                        <a href="{% url 'desativar_conta' %}" class="text-danger text-decoration-none small fw-bold opacity-75 hover-opacity-100">
+                            <i class="bi bi-trash me-1"></i> Desativar minha conta (LGPD)
+                        </a>
                     </div>
 
                 </form>
@@ -73,13 +84,11 @@
 </div>
 
 <style>
-    input[type="email"], input[type="text"], input[type="file"] {
+    input[type="email"], input[type="file"] {
         width: 100%; padding: 10px 15px; border: 1px solid #dee2e6; border-radius: 8px;
         background-color: var(--bs-body-bg); color: var(--bs-body-color);
     }
     input:focus { border-color: var(--bs-primary); outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 148, 136, 0.25); }
-    
-    /* Deixa o input file branco mesmo no dark mode para contraste, ou ajusta */
     [data-bs-theme="dark"] input[type="file"] { background-color: #1e293b; border-color: #334155; }
 </style>
 {% endblock %}

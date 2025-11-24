@@ -1,37 +1,52 @@
 {% extends 'base.html' %}
 
-{% block title %}Atendimento{% endblock %}
+{% block title %}Sessão de Fisioterapia{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
+<div class="row justify-content-center mb-5">
     <div class="col-lg-10">
         
         <div class="card mb-4 border-primary border-start border-4 shadow-sm">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div>
-                        <h4 class="mb-1 text-primary fw-bold">
-                            <i class="bi bi-person-vcard me-2"></i>{{ agendamento.paciente.usuario.get_full_name|default:agendamento.paciente.usuario.username }}
-                        </h4>
-                        <span class="badge bg-secondary-subtle text-secondary-emphasis border">
-                            <i class="bi bi-upc-scan me-1"></i>CPF: {{ agendamento.paciente.cpf }}
-                        </span>
-                        <span class="badge bg-secondary-subtle text-secondary-emphasis border ms-1">
-                            <i class="bi bi-cake2 me-1"></i>Nasc: {{ agendamento.paciente.data_nascimento|date:"d/m/Y" }}
-                        </span>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary-subtle p-3 rounded-circle text-primary me-3">
+                            <i class="bi bi-person-standing fs-3"></i>
+                        </div>
+                        <div>
+                            <h4 class="mb-0 text-primary fw-bold">
+                                {{ agendamento.paciente.usuario.get_full_name|default:agendamento.paciente.usuario.username }}
+                            </h4>
+                            <span class="text-muted small">
+                                <i class="bi bi-upc-scan me-1"></i>CPF: {{ agendamento.paciente.cpf }}
+                            </span>
+                        </div>
                     </div>
                     <div class="text-end">
-                        <small class="text-muted d-block">Horário Agendado</small>
-                        <span class="fs-5 fw-bold">{{ agendamento.data_horario|date:"H:i" }}</span>
+                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Data da Sessão</small>
+                        <div class="fs-5 fw-bold text-dark">{{ agendamento.data_horario|date:"d/m/Y H:i" }}</div>
                     </div>
                 </div>
-                <hr>
-                <p class="mb-0"><strong class="text-muted">Queixa Inicial:</strong> {{ agendamento.observacoes|default:"Não informada" }}</p>
             </div>
         </div>
 
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-body py-3">
+        {% if datas_grafico %}
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 fw-bold text-secondary">
+                    <i class="bi bi-graph-down-arrow me-2 text-success"></i>Evolução da Dor (Histórico)
+                </h5>
+            </div>
+            <div class="card-body">
+                <div style="height: 300px; width: 100%;">
+                    <canvas id="graficoEvolucao"></canvas>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white py-3">
                 <h5 class="mb-0 fw-bold"><i class="bi bi-file-medical me-2"></i>Registro Clínico</h5>
             </div>
             <div class="card-body p-4">
@@ -39,38 +54,56 @@
                 <form method="post">
                     {% csrf_token %}
                     
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-primary">📝 Histórico / Anamnese</label>
-                        {{ form.historico }}
+                    <div class="mb-4 p-4 bg-body-tertiary rounded-3 border">
+                        <label class="form-label fw-bold d-flex justify-content-between align-items-center mb-3">
+                            <span class="fs-5"><i class="bi bi-emoji-frown me-2"></i>Nível de Dor Hoje (Escala EVA)</span>
+                            <span class="badge bg-success fs-5" id="dor-display" style="width: 50px;">0</span>
+                        </label>
+                        
+                        {{ form.nivel_dor }}
+                        
+                        <div class="d-flex justify-content-between small fw-bold text-muted mt-2">
+                            <span class="text-success"><i class="bi bi-emoji-smile me-1"></i>0 - Sem dor</span>
+                            <span class="text-warning">5 - Moderada</span>
+                            <span class="text-danger">10 - Insuportável<i class="bi bi-emoji-dizzy ms-1"></i></span>
+                        </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-primary">💊 Prescrição / Receita</label>
-                        
-                        <div class="input-group mb-2">
-                            <span class="input-group-text bg-body-tertiary"><i class="bi bi-search"></i></span>
-                            <input type="text" list="lista-remedios" id="input-remedio" class="form-control" placeholder="Buscar medicamento...">
-                            <button type="button" onclick="adicionarRemedio()" class="btn btn-outline-primary">
-                                <i class="bi bi-plus-lg"></i> Adicionar
-                            </button>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-primary">📝 Evolução / Anamnese</label>
+                            {{ form.historico }}
+                            <div class="form-text">Relato do paciente e progressão.</div>
                         </div>
 
-                        <datalist id="lista-remedios">
-                            {% for remedio in lista_medicamentos %}
-                                <option value="{{ remedio.nome }}">
-                            {% endfor %}
-                        </datalist>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-primary">🤸 Conduta / Exercícios</label>
+                            
+                            <div class="input-group mb-2">
+                                <input type="text" list="lista-remedios" id="input-remedio" class="form-control" placeholder="Buscar exercício...">
+                                <button type="button" onclick="adicionarItem()" class="btn btn-outline-primary">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
+                            <datalist id="lista-remedios">
+                                {% for item in lista_medicamentos %}
+                                    <option value="{{ item.nome }}">
+                                {% endfor %}
+                            </datalist>
 
-                        {{ form.prescricao }}
-                        <div class="form-text">O texto pode ser editado livremente.</div>
+                            {{ form.prescricao }}
+                            <div class="form-text">Exercícios realizados e orientações.</div>
+                        </div>
                     </div>
 
                     <hr class="my-4">
 
-                    <div class="d-flex justify-content-between">
-                        <a href="{% url 'painel_medico' %}" class="btn btn-outline-secondary px-4">Cancelar</a>
-                        <button type="submit" class="btn btn-success btn-lg px-5 fw-bold shadow">
-                            <i class="bi bi-check2-circle me-2"></i>Finalizar Atendimento
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'painel_medico' %}" class="btn btn-outline-secondary px-4 fw-bold">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg px-5 fw-bold shadow hover-scale">
+                            <i class="bi bi-check2-circle me-2"></i>Finalizar Sessão
                         </button>
                     </div>
                 </form>
@@ -79,27 +112,138 @@
     </div>
 </div>
 
-<script>
-    function adicionarRemedio() {
-        var input = document.getElementById("input-remedio");
-        var textarea = document.getElementById("id_prescricao");
-        var remedio = input.value;
-
-        if (remedio) {
-            var prefixo = textarea.value ? "\n" : "";
-            textarea.value += prefixo + "• " + remedio;
-            input.value = "";
-            input.focus();
-        }
-    }
-</script>
-
 <style>
     textarea { 
-        width: 100%; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6;
-        background-color: var(--bs-body-bg); color: var(--bs-body-color);
-        min-height: 120px;
+        resize: vertical; 
+        min-height: 150px; 
+        border-radius: 8px;
     }
-    textarea:focus { border-color: var(--bs-primary); outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 148, 136, 0.25); }
+    
+    /* Trilho do Slider */
+    #slider_dor_input {
+        -webkit-appearance: none; /* Remove padrão do Chrome/Safari */
+        appearance: none;
+        width: 100%;
+        height: 15px; /* Altura visível */
+        background: #e9ecef; /* Cor de fundo caso gradiente falhe */
+        background: linear-gradient(90deg, #198754 0%, #ffc107 50%, #dc3545 100%);
+        border-radius: 10px;
+        outline: none;
+        border: 1px solid #ccc;
+        margin: 10px 0;
+        cursor: pointer;
+        display: block; /* Garante que ocupe espaço */
+    }
+
+    /* Bolinha (Thumb) Chrome/Edge/Safari */
+    #slider_dor_input::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 5px solid #555;
+        cursor: pointer;
+        box-shadow: 0 0 5px rgba(0,0,0,0.5);
+        margin-top: 0px; 
+    }
+
+    /* Bolinha (Thumb) Firefox */
+    #slider_dor_input::-moz-range-thumb {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 5px solid #555;
+        cursor: pointer;
+        box-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // 1. Lógica do Slider de Dor
+        const rangeInput = document.getElementById('slider_dor_input');
+        const display = document.getElementById('dor-display');
+        
+        if (rangeInput && display) {
+            // Função para atualizar cor e texto
+            function atualizarBadge(valor) {
+                display.textContent = valor;
+                
+                // Limpa classes
+                display.className = 'badge fs-5'; 
+                
+                // Define cor
+                if (valor <= 3) {
+                    display.classList.add('bg-success'); // Verde
+                } else if (valor <= 7) {
+                    display.classList.add('bg-warning', 'text-dark'); // Amarelo
+                } else {
+                    display.classList.add('bg-danger'); // Vermelho
+                }
+            }
+
+            // Evento ao mover
+            rangeInput.addEventListener('input', function() {
+                atualizarBadge(this.value);
+            });
+
+            // Inicializa
+            atualizarBadge(rangeInput.value);
+        }
+
+        // 2. Autocomplete
+        window.adicionarItem = function() {
+            var input = document.getElementById("input-remedio");
+            var textarea = document.getElementById("id_prescricao");
+            
+            if (input && textarea && input.value) {
+                var prefixo = textarea.value ? "\n" : "";
+                textarea.value += prefixo + "• " + input.value;
+                input.value = "";
+                input.focus();
+            }
+        }
+
+        // 3. Gráfico
+        const ctx = document.getElementById('graficoEvolucao');
+        if (ctx) {
+            const datas = {{ datas_grafico|safe }};
+            const dores = {{ dores_grafico|safe }};
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: datas,
+                    datasets: [{
+                        label: 'Nível de Dor',
+                        data: dores,
+                        borderColor: '#198754',
+                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#198754',
+                        pointRadius: 6,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { min: 0, max: 10, title: { display: true, text: 'Intensidade (EVA)' } }
+                    }
+                }
+            });
+        }
+    });
+</script>
+
 {% endblock %}

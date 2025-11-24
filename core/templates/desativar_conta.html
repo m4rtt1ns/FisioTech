@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-6">
+        <div class="card border-danger shadow">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">⚠️ Zona de Perigo: Desativar Conta</h4>
+            </div>
+            <div class="card-body">
+                <p>De acordo com a <strong>LGPD</strong>, você tem direito a revogar seu consentimento.</p>
+                <p>Ao desativar sua conta:</p>
+                <ul>
+                    <li>Você não poderá mais fazer agendamentos.</li>
+                    <li>Seus dados médicos serão <strong>arquivados</strong> por 20 anos (conforme exigência do Conselho Federal de Medicina), mas não estarão visíveis para novos atendimentos.</li>
+                </ul>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger w-100 fw-bold" onclick="return confirm('Tem certeza?')">
+                        Estou ciente e quero desativar minha conta
+                    </button>
+                    <a href="/" class="btn btn-secondary w-100 mt-2">Cancelar</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
